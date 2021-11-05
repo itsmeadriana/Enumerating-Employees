@@ -1,14 +1,13 @@
 /* jshint esversion: 6 */
 /* jshint esversion: 8 */
-// const cTable = require('console.table');
+const cTable = require('console.table');
 const db = require('./db/connection');
 
 class Database
  {
-
-    constructor(db) {
-        this.db = db;
-    }
+        // constructor(db) {
+    //     this.db = db;
+    // }
 
 // GET departments table
     getDepartments() {
@@ -53,12 +52,12 @@ class Database
         });
     }
 
-    addDepartment() {
+    addDepartment(newDeptName) {
         return new Promise((resolve, reject) => {
-            const sql = `INSERT INTO department (dept_name) values (?)`;
-            const params = [body.dept_name];
+            const sql = `INSERT INTO department (dept_name) VALUES ('?')`;
+            const params = newDeptName ;
 
-            db.query(sql, params, (err, result) =>{
+            db.query(sql, (err, result) =>{
                 if (err) {
                     console.log(err.message);
                     return;
@@ -70,4 +69,4 @@ class Database
 
 }
 
-module.exports = new Database(db);
+module.exports = Database;

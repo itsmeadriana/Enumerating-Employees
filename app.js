@@ -1,67 +1,64 @@
 /* jshint esversion: 6 */
 /* jshint esversion: 8 */
 
-const Database = require('./index');
+
 const Inquirer = require('inquirer');
 const cTable = require('console.table');
-const newDB = new Database();
+const Database = require('./index');
+const newDB = new Database;
 
 const inquiries = async function () {
-    Inquirer.prompt([
-        {
+    return Inquirer
+    .prompt([{
             type: 'list',
             name: 'dashboard',
             message: 'Please select an action from the following list:',
             choices: ['View all departments', 'View all roles', 'View all employees', 'Add department', 'Add role', 'Add employee', 'Update employee role', 'Quit']
-        }
-    ])
-    .then(async (input) => {
-        const action = input.dashboard;
-        if (action === 'View all departments') {
-            Database.getDepartments().then((input) => {
-                console.table(input);
-            });
-        }
-        if (action === 'View all roles') {
-            Database.getRoles().then((input) => {
-                console.table(input);
-            });
-        }
-        if (action === 'View all employees') {
-            Database.getEmployees().then((input) => {
-                console.table(input);
-            });
-        }
-        if (action === 'Add department') {
-            departmentPrompts().then((input) => {
+        }])
+        .then(async (input) => {
+            const action = input.dashboard;
+            if (action === 'View all departments') {
+                await newDB.getDepartments().then((input) => {
+                    console.table(input);
+                });
+            }
+            if (action === 'View all roles') {
+                await newDB.getRoles().then((input) => {
+                    console.table(input);
+                });
+            }
+            if (action === 'View all employees') {
+                await newDB.getEmployees().then((input) => {
+                    console.table(input);
+                });
+            }
+            if (action === 'Add department') {
                 console.log('You are now being redirected to Departments.');
-            });
-        }
-        if (action === 'Add role') {
-            rolePrompts().then((input) => {
+                return departmentPrompts();
+            }
+            if (action === 'Add role') {
                 console.log('You are now being redirected to Roles.');
-            });
-        }
-        if (action === 'Add employee') {
-            employeePrompts().then((input) => {
+                return rolePrompts();
+            }
+            if (action === 'Add employee') {
                 console.log('You are now being redirected to Employees.');
-            });
-        }
-        if (action === 'Update employee role') {
-            employeePrompts().then((input) => {
+                return employeePrompts();
+            }
+            if (action === 'Update employee role') {
                 console.log('You are now being redirected to Employees.');
-            });
-        }
-        if (action === 'Quit') {
-            return;
-        }
-        return inquiries();
-    });
+                return employeePrompts();
+            }
+            if (action === 'Quit') {
+                return;
+            }
+            return inquiries();
+        });
 };
 
 const departmentPrompts = async function () {
-    const departmentsMenu = await newDB.getDepartments();
-    Inquirer.prompt([
+    // const departmentsMenu = await Database.getDepartments();
+    return Inquirer
+    .prompt([
         {
             type: 'list',
             name: 'deptDash',
@@ -80,28 +77,23 @@ const departmentPrompts = async function () {
                     return false;
                 }
             },
-            when: ({ deptDash }) => {
-                if (deptDash === 'Add a new department') {
-                    return true;
-                } else {
-                    return false;
-                }
-            }
         }
     ])
     .then(async (input) => {
         const action = input;
-        if (action == 'Add a new department') {
-            await newDB.addDepartment(input);
-        }
+
         if (action === 'Return to main menu') {
             return inquiries();
         }
         if (action === 'Quit') {
             return;
         }
+        if (action.newDeptName) {
+            await newDB.addDepartment(input.newDeptName);
+        }
+
+        return departmentPrompts();
     });
-    return departmentsMenu();
 };
 
 
