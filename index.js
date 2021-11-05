@@ -8,6 +8,39 @@ class Database
         // constructor(db) {
     //     this.db = db;
     // }
+//  Departments array
+// let departmentsArray = [{
+//     'Accounting': {
+//         'dept_name': 'Accounting'
+//     },
+//     'Administration': {
+//         'dept_name': 'Administration'
+//     },
+//     'Executive': {
+//         'dept_name': 'Executive'
+//     },
+//     'Human Resources': {
+//         'dept_name': 'Human Resources'
+//     },
+//     'Management': {
+//         'dept_name': 'Management'
+//     },
+//     'Marketing': {
+//         'dept_name': 'Marketing'
+//     },
+//     'Public Relations': {
+//         'dept_name': 'Public Relations'
+//     },
+//     'Retail': {
+//         'dept_name': 'Retail'
+//     },
+//     'Sales': {
+//         'dept_name': 'Sales'
+//     },
+//     'Telecommunications': {
+//         'dept_name': 'Telecommunications'
+//     }
+// }]
 
 // GET departments table
     getDepartments() {
@@ -27,7 +60,7 @@ class Database
 // GET roles table
     getRoles() {
         return new Promise((resolve, reject) => {
-            const sql = `SELECT * FROM role`;
+            const sql = `SELECT role.title, role.salary, department.dept_name FROM role LEFT JOIN department ON role.department_id = department.id`;
             db.query(sql, (err, rows) => {
                 if (err) {
                     console.log(err.message);
@@ -52,12 +85,13 @@ class Database
         });
     }
 
+// POST new department to department table
     addDepartment(newDeptName) {
         return new Promise((resolve, reject) => {
-            const sql = `INSERT INTO department (dept_name) VALUES ('?')`;
-            const params = newDeptName ;
+            const sql = `INSERT INTO department (dept_name) VALUES (?)`;
+            const params = [newDeptName] ;
 
-            db.query(sql, (err, result) =>{
+            db.query(sql, params, (err, result) =>{
                 if (err) {
                     console.log(err.message);
                     return;
@@ -66,6 +100,27 @@ class Database
             });
         });
     }
+
+// POST new role to role table
+    addRole(newRoleTitle, newRoleSalary, newRoleDeptId) {
+        return new Promise((resolve, reject) => {
+            const sql = `INSERT INTO role (title, salary, department_id) VALUES (?,?,?)`;
+            const params = [newRoleTitle, newRoleSalary, newRoleDeptId] ;
+
+            db.query(sql, params, (err, result) =>{
+                if (err) {
+                    console.log(err.message);
+                    return;
+                }
+                resolve(console.log(`${newRoleTitle} has been added to the database.`));
+            });
+        });
+    }
+
+// POST a new employee to employee table
+    // addEmployee(newName, newLastName, new) {
+
+    // }
 
 }
 

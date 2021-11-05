@@ -77,10 +77,18 @@ const departmentPrompts = async function () {
                     return false;
                 }
             },
+            when: ({ deptDash }) => {
+                if ( deptDash === 'Add a new department') {
+                    return true;
+                }
+                else {
+                    return false;
+                }
+            }
         }
     ])
     .then(async (input) => {
-        const action = input;
+        const action = input.deptDash;
 
         if (action === 'Return to main menu') {
             return inquiries();
@@ -88,13 +96,105 @@ const departmentPrompts = async function () {
         if (action === 'Quit') {
             return;
         }
-        if (action.newDeptName) {
+        if (action === 'Add a new department') {
             await newDB.addDepartment(input.newDeptName);
         }
-
-        return departmentPrompts();
+        return inquiries();
     });
 };
 
+const rolePrompts = async function () {
+    return Inquirer
+    .prompt([
+        {
+            type: 'list',
+            name: 'roleDash',
+            message: 'Please select a modification from the following list:',
+            choices: ['Add a new role', 'Return to main menu', 'Quit'],
+        },
+        {
+            type: 'input',
+            name: 'newRoleTitle',
+            message: 'Please enter the title of the role you wish to add to the database.',
+            validate: input => {
+                if (input) {
+                    return true;
+                } else {
+                    console.log('You cannot proceed without entering the title of the role you wish to add to the database. Please enter that name now.');
+                    return false;
+                }
+            },
+            when: ({ roleDash }) => {
+                if ( roleDash === 'Add a new role') {
+                    return true;
+                }
+                else {
+                    return false;
+                }
+            }
+        },
+        {
+            type: 'input',
+            name: 'newRoleSalary',
+            message: 'Please enter the new role salary.',
+            validate: input => {
+                if (isNaN(input) || !input) {
+                    console.log('Please enter a salary with numeric characters only.');
+                    return false;
+                }
+                else {
+                    return true;
+                }
+            },
+            when: ({ roleDash }) => {
+                if ( roleDash === 'Add a new role') {
+                    return true;
+                }
+                else {
+                    return false;
+                }
+            }
+        },
+        {
+            type: 'list',
+            name: 'newRoleDeptId',
+            message: 'Please select the new role department from the following list:',
+            choices: [
+                ({'name': 'Accounting', 'value': 1}),
+                ({'name': 'Administration', 'value': 2}),
+                ({'name': 'Executive', 'value': 3}),
+                ({'name': 'Human Resources', 'value': 4}),
+                ({'name': 'Management', 'value': 5}),
+                ({'name': 'Marketing', 'value': 6}),
+                ({'name': 'Public Relations', 'value': 7}),
+                ({'name': 'Retail', 'value': 8}),
+                ({'name': 'Sales', 'value': 9}),
+                ({'name': 'Telecommunications', 'value': 10})
+            ],
+            when: ({ roleDash }) => {
+                if ( roleDash === 'Add a new role') {
+                    return true;
+                }
+                else {
+                    return false;
+                }
+            }
+        }
+    ])
+    .then(async (input) => {
+        const action = input.roleDash;
+
+        if (action === 'Return to main menu') {
+            return inquiries();
+        }
+        if (action === 'Quit') {
+            return;
+        }
+        if (action === 'Add a new role') {
+            await newDB.addRole(input.newRoleTitle, input.newRoleSalary, input.newRoleDeptId);
+        }
+        return inquiries();
+    });
+};
 
 inquiries();
