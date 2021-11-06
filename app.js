@@ -104,6 +104,7 @@ const departmentPrompts = async function () {
 };
 
 const rolePrompts = async function () {
+    const departmentNamesOnly = await newDB.getDepartmentNamesOnly();
     return Inquirer
     .prompt([
         {
@@ -159,18 +160,7 @@ const rolePrompts = async function () {
             type: 'list',
             name: 'newRoleDeptId',
             message: 'Please select the new role department from the following list:',
-            choices: [
-                ({'name': 'Accounting', 'value': 1}),
-                ({'name': 'Administration', 'value': 2}),
-                ({'name': 'Executive', 'value': 3}),
-                ({'name': 'Human Resources', 'value': 4}),
-                ({'name': 'Management', 'value': 5}),
-                ({'name': 'Marketing', 'value': 6}),
-                ({'name': 'Public Relations', 'value': 7}),
-                ({'name': 'Retail', 'value': 8}),
-                ({'name': 'Sales', 'value': 9}),
-                ({'name': 'Telecommunications', 'value': 10})
-            ],
+            choices: departmentNamesOnly,
             when: ({ roleDash }) => {
                 if ( roleDash === 'Add a new role') {
                     return true;
@@ -192,6 +182,104 @@ const rolePrompts = async function () {
         }
         if (action === 'Add a new role') {
             await newDB.addRole(input.newRoleTitle, input.newRoleSalary, input.newRoleDeptId);
+        }
+        return inquiries();
+    });
+};
+
+const employeePrompts = async function () {
+    const roleTitlesOnly = await newDB.getRoleTitlesOnly();
+    const managersOnly = await newDB.getManagersOnly();
+    return Inquirer
+    .prompt([
+        {
+            type: 'list',
+            name: 'employeeDash',
+            message: 'Please select a modification from the following list:',
+            choices: ['Add a new employee', 'Update employee manager','Return to main menu', 'Quit'],
+        },
+        {
+            type: 'input',
+            name: 'newEmployeeFirstName',
+            message: 'Please enter the employee\'s first name.',
+            when: ({ employeeDash }) => {
+                if ( employeeDash === 'Add a new employee') {
+                    return true;
+                }
+                else {
+                    return false;
+                }
+            },
+            validate: input => {
+                if (input) {
+                    return true;
+                } else {
+                    console.log('You cannot proceed without entering the first name of the employee you wish to add to the database. Please enter that name now.');
+                    return false;
+                }
+            },
+        },
+        {
+            type: 'input',
+            name: 'newEmployeeLastName',
+            message: 'Please enter the employee\'s last name.',
+            validate: input => {
+                if (input) {
+                    return true;
+                } else {
+                    console.log('You cannot proceed without entering the last name of the employee you wish to add to the database. Please enter that name now.');
+                    return false;
+                }
+            },
+            when: ({ employeeDash }) => {
+                if ( employeeDash === 'Add a new employee') {
+                    return true;
+                }
+                else {
+                    return false;
+                }
+            }
+        },
+        {
+            type: 'list',
+            name: 'newEmployeeRoleId',
+            message: 'Please select the new employee\'s role from the following list:',
+            choices: roleTitlesOnly,
+            when: ({ employeeDash }) => {
+                if ( employeeDash === 'Add a new employee') {
+                    return true;
+                }
+                else {
+                    return false;
+                }
+            }
+        },
+        {
+            type: 'list',
+            name: 'newEmployeeManagerId',
+            message: 'Please select the new employee\'s manager from the following list:',
+            choices: managersOnly,
+            when: ({ employeeDash }) => {
+                if ( employeeDash === 'Add a new employee') {
+                    return true;
+                }
+                else {
+                    return false;
+                }
+            }
+        }
+    ])
+    .then(async (input) => {
+        const action = input.employeeDash;
+
+        if (action === 'Return to main menu') {
+            return inquiries();
+        }
+        if (action === 'Quit') {
+            return;
+        }
+        if (action === 'Add a new role') {
+            await newDB.addEmployee(input.newEmployeeFirstName, input.newEmployeeLastName, input.newEmployeeRoleId, input.newEmployeeManagerId);
         }
         return inquiries();
     });
