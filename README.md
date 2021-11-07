@@ -24,7 +24,7 @@ Cone this repository or download the project's zip fle. After initial installati
 
 ## Preview:
 #### Click the image below to be directed to a brief walk-through video of this CLI app.
-[![](public/assets/images/Take-Notes-Screenshot.png)](https://drive.google.com/file/d/1t4cVPMSEm3gZyUgvEsuwaQxarN6i4ytq/view?usp=sharing)
+[![](assets/Enumerating-Employees-Walkthrough-Screenshot.png)](https://drive.google.com/file/d/1t4cVPMSEm3gZyUgvEsuwaQxarN6i4ytq/view?usp=sharing)
 
 ## Credits:
 Inquirer.js, MySQL
