@@ -23,7 +23,8 @@ This app will make it easy to view and interact with stored data. As a command-l
 Cone this repository or download the project's zip fle. After initial installations, run ```node app.js`` from the Command Line and select an action from the list of choices offered. You may view or add departments, roles, and employees, and update an employee's role. Easily interact with your company's employee database with Enumerating Employees!
 
 ## Preview:
-([![Click the image below for a brief walk-through video of the app.](public/assets/images/Take-Notes-Screenshot.png)](https://drive.google.com/file/d/1t4cVPMSEm3gZyUgvEsuwaQxarN6i4ytq/view?usp=sharing)
+#### Click the image below to be directed to a brief walk-through video of this CLI app.
+[![](public/assets/images/Take-Notes-Screenshot.png)](https://drive.google.com/file/d/1t4cVPMSEm3gZyUgvEsuwaQxarN6i4ytq/view?usp=sharing)
 
 ## Credits:
 Inquirer.js, MySQL
