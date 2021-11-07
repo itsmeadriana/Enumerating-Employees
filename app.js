@@ -7,7 +7,7 @@ const cTable = require('console.table');
 const Database = require('./index');
 const newDB = new Database;
 
-const inquiries = async function () {
+const mainMenu = async function () {
     return Inquirer
     .prompt([{
             type: 'list',
@@ -45,13 +45,13 @@ const inquiries = async function () {
                 return employeePrompts();
             }
             if (action === 'Update employee role') {
-                console.log('You are now being redirected to Employees.');
-                return employeePrompts();
+                console.log('You are now being redirected to Update Employee Role.');
+                return updateEmployeeRolePrompts();
             }
             if (action === 'Quit') {
                 return;
             }
-            return inquiries();
+            return mainMenu();
         });
 };
 
@@ -91,7 +91,7 @@ const departmentPrompts = async function () {
         const action = input.deptDash;
 
         if (action === 'Return to main menu') {
-            return inquiries();
+            return mainMenu();
         }
         if (action === 'Quit') {
             return;
@@ -99,7 +99,7 @@ const departmentPrompts = async function () {
         if (action === 'Add a new department') {
             await newDB.addDepartment(input.newDeptName);
         }
-        return inquiries();
+        return mainMenu();
     });
 };
 
@@ -175,7 +175,7 @@ const rolePrompts = async function () {
         const action = input.roleDash;
 
         if (action === 'Return to main menu') {
-            return inquiries();
+            return mainMenu();
         }
         if (action === 'Quit') {
             return;
@@ -183,7 +183,7 @@ const rolePrompts = async function () {
         if (action === 'Add a new role') {
             await newDB.addRole(input.newRoleTitle, input.newRoleSalary, input.newRoleDeptId);
         }
-        return inquiries();
+        return mainMenu();
     });
 };
 
@@ -195,8 +195,8 @@ const employeePrompts = async function () {
         {
             type: 'list',
             name: 'employeeDash',
-            message: 'Please select a modification from the following list:',
-            choices: ['Add a new employee', 'Update employee manager','Return to main menu', 'Quit'],
+            message: 'Please select an action from the following list:',
+            choices: ['Add a new employee', 'Return to main menu', 'Quit'],
         },
         {
             type: 'input',
@@ -273,16 +273,70 @@ const employeePrompts = async function () {
         const action = input.employeeDash;
 
         if (action === 'Return to main menu') {
-            return inquiries();
+            return mainMenu();
         }
         if (action === 'Quit') {
             return;
         }
-        if (action === 'Add a new role') {
+        if (action === 'Add a new employee') {
+
             await newDB.addEmployee(input.newEmployeeFirstName, input.newEmployeeLastName, input.newEmployeeRoleId, input.newEmployeeManagerId);
         }
-        return inquiries();
+        return mainMenu();
     });
 };
 
-inquiries();
+const updateEmployeeRolePrompts = async function () {
+    const employeeNamesOnly = await newDB.getEmployeeNamesOnly();
+    const roleTitlesOnly = await newDB.getRoleTitlesOnly();
+    return Inquirer
+    .prompt([
+        {
+            type: 'list',
+            name: 'updateRoleDash',
+            message: 'Please select an action from the following list:',
+            choices: ['Update employee role', 'Return to main menu', 'Quit'],
+        },
+        {
+            type: 'list',
+            name: 'employeeGettingUpdate',
+            message: 'Please select the name of the employee whose role you\'d like to update from the following list:',
+            choices: employeeNamesOnly,
+            when: ({ updateRoleDash }) => {
+                if ( updateRoleDash === 'Update employee role') {
+                    return true;
+                } else {
+                    return false;
+                }
+            }
+        },
+        {
+            type: 'list',
+            name: 'RoleChoices',
+            message: 'Please select a new role from the following list:',
+            choices: roleTitlesOnly,
+            when: ({ updateRoleDash }) => {
+                if ( updateRoleDash === 'Update employee role') {
+                    return true;
+                } else {
+                    return false;
+                }
+            }
+        }
+    ])
+    .then(async (input) => {
+        const action = input.updateRoleDash;
+        if (action === 'Return to main menu') {
+            return mainMenu();
+        }
+        if (action === 'Quit') {
+            return;
+        }
+        if (action === 'Update employee role') {
+            await newDB.updateEmployeeRole(input.employeeGettingUpdate, input.RoleChoices);
+        }
+        return mainMenu();
+    });
+};
+
+mainMenu();

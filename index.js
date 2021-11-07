@@ -64,9 +64,43 @@ class Database
         });
     }
 
+// GET employee id only
+    getEmployeeIdsOnly(employeeName) {
+        return new Promise((resolve, reject) => {
+            // if (!hasManager) {
+            //     resolve(null);
+            // }
+            const sql = `SELECT id from employee WHERE CONCAT_WS(' ', employee.first_name, employee.last_name) = ?`;
+            const params = employeeName;
+            db.query(sql, params, (err, rows) => {
+                if (err) {
+                    console.log(err.message);
+                    return;
+                }
+                const employeeArray = rows.map(object => object.id)[0];
+                resolve(employeeArray);
+            });
+        });
+    }
+
+// GET employee id only
+    getEmployeeNamesOnly() {
+        return new Promise((resolve, reject) => {
+
+            const sql = `SELECT CONCAT_WS(' ', employee.first_name, employee.last_name) AS name FROM employee`;
+            db.query(sql, (err, rows) => {
+                if (err) {
+                    console.log(err.message);
+                    return;
+                }
+                const employeeArray = rows.map(object => object.name);
+                resolve(employeeArray);
+            });
+        });
+    }
+
 // GET dept_names only
     getDepartmentNamesOnly() {
-        console.log('wHY ME');
         return new Promise ((resolve, reject) => {
             const sql = `SELECT department.dept_name FROM department`;
             db.query(sql, (err, rows) => {
@@ -90,7 +124,7 @@ class Database
                     console.log(err.message);
                     return;
                 }
-                const departmentsArray = rows.map(object => object.id);
+                const departmentsArray = rows.map(object => object.id)[0];
                 resolve(departmentsArray);
             });
         });
@@ -114,14 +148,14 @@ class Database
 // GET role ids only
     getRoleIdsOnly(role) {
         return new Promise ((resolve, reject) => {
-            const sql = `SELECT id FROM role where role.title = ?`;
+            const sql = `SELECT id FROM role WHERE role.title = ?`;
             const params = role;
             db.query(sql, params, (err, rows) => {
                 if (err) {
                     console.log(err.message);
                     return;
                 }
-                const rolesArray = rows.map(object => object.id);
+                const rolesArray = rows.map(object => object.id)[0];
                 resolve(rolesArray);
             });
         });
@@ -130,7 +164,7 @@ class Database
 // GET managers only
     getManagersOnly() {
         return new Promise ((resolve, reject) => {
-            const sql = `SELECT DISTINCT CONCAT_WS('', m.first_name, m.last_name) AS managers
+            const sql = `SELECT DISTINCT CONCAT_WS(' ', m.first_name, m.last_name) AS managers
             FROM employee e
             LEFT JOIN employee m on e.manager_id = m.id`;
 
@@ -180,16 +214,36 @@ class Database
 
 // POST a new employee to employee table
     async addEmployee(newEmployeeFirstName, newEmployeeLastName, newEmployeeRoleId, newEmployeeManagerId) {
+        const roleIdOnly = await this.getRoleIdsOnly(newEmployeeRoleId);
+        const managerIdOnly = await this.getEmployeeIdsOnly(newEmployeeManagerId);
         return new Promise((resolve, reject) => {
-            const sql = `INSERT INTO role (first_name, last_name, role_id, manager_id) VALUES (?,?,?)`;
-            const params = [newEmployeeFirstName, newEmployeeLastName, newEmployeeRoleId, newEmployeeManagerId] ;
+            const sql = `INSERT INTO employee (first_name, last_name, role_id, manager_id) VALUES (?,?,?,?)`;
+            const params = [newEmployeeFirstName, newEmployeeLastName, roleIdOnly, managerIdOnly] ;
 
             db.query(sql, params, (err, result) =>{
                 if (err) {
                     console.log(err.message);
                     return;
                 }
-                resolve(console.log(`${newEmployeeFirstName} ${newEmployeeLastName}  has been added to the database.`));
+                resolve(console.log(`${newEmployeeFirstName} ${newEmployeeLastName} has been added to the database.`));
+            });
+        });
+    }
+
+// UPDATE employee role
+    async updateEmployeeRole (employee, updatedRole) {
+        const employeeIdOnly = await this.getEmployeeIdsOnly(employee);
+        const roleIdOnly = await this.getRoleIdsOnly(updatedRole);
+        return new Promise((resolve, reject) => {
+            const sql = `UPDATE employee SET role_id = ? WHERE id = ?`;
+            const params = [roleIdOnly, employeeIdOnly];
+
+            db.query(sql, params, (err, result) => {
+                if (err)  {
+                    console.log(err.message);
+                    return;
+                }
+                resolve(console.log(`${employee}'s role has been updated to ${updatedRole}.`));
             });
         });
     }
